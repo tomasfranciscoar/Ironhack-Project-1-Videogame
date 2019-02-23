@@ -1,0 +1,69 @@
+@font-face {
+  font-family: 'pixelart';
+  src: url("./Font/press_start_2p/PressStart2P.ttf")
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'pixelart';
+  color: white;
+  background-image: url("./images/roma-alfonso-cuaron-netflix-venecia-1-1535646586.jpg");
+  background-repeat: no-repeat;
+  background-size: 200vh;
+  display: flex;
+  justify-content: center;
+}
+
+.main-pannel {
+  background-color: rgba(0,0,0,0.5);
+  border-style: groove;
+  width: 600px;
+  margin-top: 250px;
+  padding: 30px;
+}
+
+.main-pannel h1 {
+  margin-left: 180px;
+}
+
+.menu {
+  background: black;
+  width: 350px;
+  border-style: groove;
+  border-radius: 5px;
+  line-height: 40px;
+  margin-left: 200px;
+  margin-top: 20px;
+}
+
+.menu li {
+  padding-left: 70px;
+  list-style-type: none;
+}
+
+.main-pannel-off {
+  display: none;
+}
+
+.main-game-off {
+  display: none;
+}
+
+.main-game-on {
+  margin-top:200px;
+}
+
+button {
+  background-color: rgba(0,0,128,0.2);
+  font-family: 'pixelart';
+  color: white;
+  margin-top: 20px;
+  margin-left: 360px;
+  font-size: 20px;
+  padding: 7px;
+  border-style: groove;
+}
