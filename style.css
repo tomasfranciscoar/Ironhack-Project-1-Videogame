@@ -22,15 +22,17 @@ body {
   background-color: rgba(0,0,0,0.5);
   border-style: groove;
   width: 600px;
-  margin-top: 250px;
+  margin-top: 18%;
   padding: 30px;
+  position: absolute;
 }
 
 .main-pannel h1 {
-  margin-left: 180px;
+  margin-left: 120px;
 }
 
 .menu {
+  position: relative;
   background: black;
   width: 350px;
   border-style: groove;
@@ -45,6 +47,25 @@ body {
   list-style-type: none;
 }
 
+.instructions-detail {
+  position: relative;
+  top: 242px;
+  left: 360px;
+  background-color: rgba(5, 35, 202, 0.9);
+  font-size: 10px;
+  border: groove;
+}
+
+.instructions-detail-off {
+  display: none;
+}
+
+.instructions-detail p {
+  text-align: center;
+  padding: 4px;
+  line-height: 20px;
+}
+
 .main-pannel-off {
   display: none;
 }
@@ -57,13 +78,21 @@ body {
   margin-top:200px;
 }
 
-button {
+.button {
   background-color: rgba(0,0,128,0.2);
   font-family: 'pixelart';
   color: white;
   margin-top: 20px;
-  margin-left: 360px;
   font-size: 20px;
   padding: 7px;
   border-style: groove;
+}
+
+.game-nav {
+  margin-left: 200px;
+  align-content: baseline;
+}
+
+#menu-btn, #high-score-btn {
+  font-size: 10px;
 }
