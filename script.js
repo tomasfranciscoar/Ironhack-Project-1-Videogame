@@ -9,6 +9,7 @@ var time = 0;
 var chavoTamalArr = [];
 var camionHealth = 100;
 var jefaHealth = 100;
+var electrodomesticos = [];
 
 class Background{
   constructor(){
@@ -17,7 +18,7 @@ class Background{
     this.width = canvas.width*2;
     this.height = canvas.height;
     this.image = new Image();
-    this.image.src = "./images/Fondo doble.png";
+    this.image.src = "./images/Fondo-doble.png";
   }
   time(){
     if(frames % 60 === 0) time++
@@ -32,16 +33,10 @@ class Background{
     ctx.fillText("SCORE: " + score, 60, 50)
   }
   infoNavBar(){
-    ctx.fillStyle = "gray";
-    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "red";
+    ctx.globalAlpha = 0.4;
     ctx.fillRect(25,18,750,50);
     ctx.globalAlpha = 1.0;
-  }
-  credits(){
-    ctx.fillStyle = "black";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "white";
-    ctx.fillText("PROGRAMMING: TOMAS FREIRE", 350, canvas.height);
   }
   draw(){
     // ctx.fillStyle = grey;
@@ -90,14 +85,29 @@ class Camion{
   }
 }
 
+class Electrodomesticos{
+  constructor(width, height, imagesrc){
+    this.x = Math.floor(Math.random() * canvas.width);
+    this.y = 0;
+    this.width = width;
+    this.height = height;
+    this.image = new Image();
+    this.image.src = imagesrc;
+  }
+  draw(){
+    this.y++
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+  }
+}
+
 class ChavoTamal{
   constructor(y){
     this.x = canvas.width;
     this.y = y;
     this.width = 130;
-    this.height = 70;
+    this.height = 110;
     this.image = new Image();
-    this.image.src = "./images/Bici tamales left.png";
+    this.image.src = "./images/Bici 1 left.png";
   }
   draw(){
     this.x -= 2;
@@ -105,8 +115,52 @@ class ChavoTamal{
   }
 }
 
+class Credits{
+  constructor(){
+    this.x = 250;
+    this.y = canvas.height;
+    this.width = canvas.width;
+    this.height = canvas.height;
+  }
+  draw(){
+    this.y--
+    if(this.y < 160) this.y = 160;
+    ctx.fillStyle = "black";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "white";
+    ctx.font = "30px pixelart";
+    ctx.fillText("GAME OVER", 270, this.y)
+    ctx.font = "15px pixelart";
+    ctx.fillText("PROGRAMMING: TOMAS FREIRE", 210, this.y + 100);
+    ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 150);
+  }
+}
+
 var background = new Background();
 var camion = new Camion();
+var credits = new Credits();
+
+function generateElectrodomesticos(){
+  if(!(frames % 350 === 0)) return;
+  let electrodomesticosSqr = ["./images/Electrodomesticos/Colchon.png", "./images/Electrodomesticos/Horno.png"];
+  let electrodomesticosVer = ["./images/Electrodomesticos/Heladera.png", "./images/Electrodomesticos/Lavarropas.png"];
+  let electrodomesticosHor = ["./images/Electrodomesticos/Microondas.png", "./images/Electrodomesticos/Radiador.png"];
+  let electroSqr = new Electrodomesticos(50, 50, electrodomesticosSqr[Math.floor(Math.random() * electrodomesticosSqr.length)]);
+  let electroVer = new Electrodomesticos(50, 80, electrodomesticosVer[Math.floor(Math.random() * electrodomesticosVer.length)]);
+  let electroHor = new Electrodomesticos(80, 50, electrodomesticosHor[Math.floor(Math.random() * electrodomesticosHor.length)]);
+  electrodomesticos.push(electroSqr);
+  electrodomesticos.push(electroVer);
+  electrodomesticos.push(electroHor);
+}
+
+function drawElectrodomesticos(){
+  electrodomesticos.forEach( (electro, index) => {
+    if(electro.y > canvas.height + electro.height){
+      return electrodomesticos.splice(index, 1);
+    }
+    electro.draw()
+  })
+}
 
 function generateChavoTamal(){
   if(!(frames % 300 === 0)) return;
@@ -132,6 +186,8 @@ function update(){
   background.time();
   generateChavoTamal();
   drawChavoTamal();
+  generateElectrodomesticos();
+  drawElectrodomesticos();
   camion.draw();
 }
 
