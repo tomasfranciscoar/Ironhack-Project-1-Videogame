@@ -32,6 +32,12 @@ class Background{
     ctx.fillStyle = "white";
     ctx.fillText("SCORE: " + score, 60, 50)
   }
+  healthBar(){
+    ctx.image = new Image();
+    ctx.image.src = "./images/HB 075.png"
+    ctx.drawImage(ctx.image, 540, 35, 200, 20);
+
+  }
   infoNavBar(){
     ctx.fillStyle = "red";
     ctx.globalAlpha = 0.4;
@@ -41,7 +47,7 @@ class Background{
   draw(){
     // ctx.fillStyle = grey;
     // ctx.fillRect(0,0,canvas.width,canvas.height);
-    this.x--
+    // this.x--
     if(this.x > 0) this.x = 0;
     if(this.x < -(canvas.width*2)) this.x = 0;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
@@ -110,7 +116,9 @@ class ChavoTamal{
     this.image.src = "./images/Bici 1 left.png";
   }
   draw(){
-    this.x -= 2;
+    this.x--;
+    if(time >= 50) this.x--;
+    if(time >= 150) this.x--;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
@@ -145,9 +153,9 @@ function generateElectrodomesticos(){
   let electrodomesticosSqr = ["./images/Electrodomesticos/Colchon.png", "./images/Electrodomesticos/Horno.png"];
   let electrodomesticosVer = ["./images/Electrodomesticos/Heladera.png", "./images/Electrodomesticos/Lavarropas.png"];
   let electrodomesticosHor = ["./images/Electrodomesticos/Microondas.png", "./images/Electrodomesticos/Radiador.png"];
-  let electroSqr = new Electrodomesticos(50, 50, electrodomesticosSqr[Math.floor(Math.random() * electrodomesticosSqr.length)]);
-  let electroVer = new Electrodomesticos(50, 80, electrodomesticosVer[Math.floor(Math.random() * electrodomesticosVer.length)]);
-  let electroHor = new Electrodomesticos(80, 50, electrodomesticosHor[Math.floor(Math.random() * electrodomesticosHor.length)]);
+  let electroSqr = new Electrodomesticos(35, 35, electrodomesticosSqr[Math.floor(Math.random() * electrodomesticosSqr.length)]);
+  let electroVer = new Electrodomesticos(35, 60, electrodomesticosVer[Math.floor(Math.random() * electrodomesticosVer.length)]);
+  let electroHor = new Electrodomesticos(60, 35, electrodomesticosHor[Math.floor(Math.random() * electrodomesticosHor.length)]);
   electrodomesticos.push(electroSqr);
   electrodomesticos.push(electroVer);
   electrodomesticos.push(electroHor);
@@ -184,11 +192,12 @@ function update(){
   background.infoNavBar();
   background.score();
   background.time();
+  background.healthBar();
   generateChavoTamal();
   drawChavoTamal();
+  camion.draw();
   generateElectrodomesticos();
   drawElectrodomesticos();
-  camion.draw();
 }
 
 function restart(){
@@ -196,6 +205,7 @@ function restart(){
 }
 
 function startGame(){
+  if(interval !== undefined) return;
   interval = setInterval(update, 1000/60)
 }
 
