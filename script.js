@@ -1,6 +1,8 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+// ctx.fillRect(0,0,canvas.width,canvas.height);
+
 var frames = 0;
 var interval;
 // var gravity = 2;
@@ -10,6 +12,16 @@ var chavoTamalArr = [];
 var camionHealth = 100;
 var jefaHealth = 100;
 var electrodomesticos = [];
+var creditsInterval;
+var example = true
+
+var mainTheme = new Audio();
+mainTheme.src = "./Sounds/Tetris - A-Type Music (version 1.0).mp3";
+mainTheme.loop = true;
+
+var audioColchones = new Audio();
+audioColchones.src = "./Sounds/SeCompranColchones.m4a"
+audioColchones.loop = true;
 
 class Background{
   constructor(){
@@ -27,7 +39,6 @@ class Background{
     ctx.fillText("TIME: " + time, 330, 50)
   }
   score(){
-    if(frames % 60 === 0) score++;
     ctx.font = "15px pixelart";
     ctx.fillStyle = "white";
     ctx.fillText("SCORE: " + score, 60, 50)
@@ -35,14 +46,17 @@ class Background{
   healthBar(){
     ctx.image = new Image();
     ctx.image.src = "./images/HB 075.png"
-    ctx.drawImage(ctx.image, 540, 35, 200, 20);
+    ctx.drawImage(ctx.image, 540, 31, 200, 20);
 
   }
   infoNavBar(){
-    ctx.fillStyle = "red";
-    ctx.globalAlpha = 0.4;
-    ctx.fillRect(25,18,750,50);
+    ctx.fillStyle = "black";
+    ctx.globalAlpha = 0.7;
+    ctx.fillRect(25,26,750,30);
     ctx.globalAlpha = 1.0;
+  }
+  audio(){
+    // mainTheme.play();
   }
   draw(){
     // ctx.fillStyle = grey;
@@ -76,9 +90,17 @@ class Camion{
   moveDown(){
     this.y += 4
   }
-  // jump(){
-  //   this.y -= 60
-  // }
+  collision(item){
+    return (this.x < item.x + item.width) &&
+        (this.x + this.width > item.x) &&
+        (this.y < item.y + item.height) &&
+        (this.y + this.height > item.y);
+  }
+  audio(){
+    if(!(frames % 3600 === 0)) {audioColchones.play()
+    } else {
+      audioColchones.pause()}
+  }
   draw(){
     if(this.x < 0) this.x = 0;
     if(this.x > canvas.width-this.width-30){
@@ -93,7 +115,7 @@ class Camion{
 
 class Electrodomesticos{
   constructor(width, height, imagesrc){
-    this.x = Math.floor(Math.random() * canvas.width);
+    this.x = Math.floor(Math.random() * canvas.width - 60);
     this.y = 0;
     this.width = width;
     this.height = height;
@@ -101,7 +123,7 @@ class Electrodomesticos{
     this.image.src = imagesrc;
   }
   draw(){
-    this.y++
+    this.y += .5;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
@@ -110,8 +132,8 @@ class ChavoTamal{
   constructor(y){
     this.x = canvas.width;
     this.y = y;
-    this.width = 130;
-    this.height = 110;
+    this.width = 80;
+    this.height = 70;
     this.image = new Image();
     this.image.src = "./images/Bici 1 left.png";
   }
@@ -131,16 +153,16 @@ class Credits{
     this.height = canvas.height;
   }
   draw(){
-    this.y--
-    if(this.y < 160) this.y = 160;
-    ctx.fillStyle = "black";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "white";
-    ctx.font = "30px pixelart";
-    ctx.fillText("GAME OVER", 270, this.y)
-    ctx.font = "15px pixelart";
-    ctx.fillText("PROGRAMMING: TOMAS FREIRE", 210, this.y + 100);
-    ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 150);
+      this.y--
+      if(this.y < 160) this.y = 160;
+      ctx.fillStyle = "black";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "30px pixelart";
+      ctx.fillText("GAME OVER", 270, this.y)
+      ctx.font = "15px pixelart";
+      ctx.fillText("PROGRAMMING: TOMAS FREIRE", 210, this.y + 100);
+      ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 150)
   }
 }
 
@@ -148,30 +170,80 @@ var background = new Background();
 var camion = new Camion();
 var credits = new Credits();
 
-function generateElectrodomesticos(){
+// class FierrosViejos{
+//   constructor(){
+//     this.x = camion.x;
+//     this.y = camion.y;
+//     this.width = 50;
+//     this.height = 5;
+//     this.image = new Image();
+//     this.image.src = "./images/fierroViejo.png"
+//   }
+//   draw(){
+//     this.x++;
+//     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+//   }
+// }
+
+function generateElectrodomesticosHor(){
   if(!(frames % 350 === 0)) return;
-  let electrodomesticosSqr = ["./images/Electrodomesticos/Colchon.png", "./images/Electrodomesticos/Horno.png"];
-  let electrodomesticosVer = ["./images/Electrodomesticos/Heladera.png", "./images/Electrodomesticos/Lavarropas.png"];
   let electrodomesticosHor = ["./images/Electrodomesticos/Microondas.png", "./images/Electrodomesticos/Radiador.png"];
-  let electroSqr = new Electrodomesticos(35, 35, electrodomesticosSqr[Math.floor(Math.random() * electrodomesticosSqr.length)]);
-  let electroVer = new Electrodomesticos(35, 60, electrodomesticosVer[Math.floor(Math.random() * electrodomesticosVer.length)]);
   let electroHor = new Electrodomesticos(60, 35, electrodomesticosHor[Math.floor(Math.random() * electrodomesticosHor.length)]);
-  electrodomesticos.push(electroSqr);
-  electrodomesticos.push(electroVer);
   electrodomesticos.push(electroHor);
 }
 
-function drawElectrodomesticos(){
+function drawElectrodomesticosHor(){
   electrodomesticos.forEach( (electro, index) => {
     if(electro.y > canvas.height + electro.height){
       return electrodomesticos.splice(index, 1);
     }
     electro.draw()
+    if(camion.collision(electro)){
+      score++;
+    }
+  })
+}
+
+function generateElectrodomesticosSqr(){
+  if(!(frames % 900 === 0)) return;
+  let electrodomesticosSqr = ["./images/Electrodomesticos/Colchon.png", "./images/Electrodomesticos/Horno.png"];
+  let electroSqr = new Electrodomesticos(35, 35, electrodomesticosSqr[Math.floor(Math.random() * electrodomesticosSqr.length)]);
+  electrodomesticos.push(electroSqr);
+}
+
+function drawElectrodomesticosSqr(){
+  electrodomesticos.forEach( (electro, index) => {
+    if(electro.y > canvas.height + electro.height){
+      return electrodomesticos.splice(index, 1);
+    }
+    electro.draw()
+    if(camion.collision(electro)){
+      score++;
+    }
+  })
+}
+
+function generateElectrodomesticosVer(){
+  if(!(frames % 1200 === 0)) return;
+  let electrodomesticosVer = ["./images/Electrodomesticos/Heladera.png", "./images/Electrodomesticos/Lavarropas.png"];
+  let electroVer = new Electrodomesticos(35, 60, electrodomesticosVer[Math.floor(Math.random() * electrodomesticosVer.length)]);
+  electrodomesticos.push(electroVer);
+}
+
+function drawElectrodomesticosVer(){
+  electrodomesticos.forEach( (electro, index) => {
+    if(electro.y > canvas.height + electro.height){
+      return electrodomesticos.splice(index, 1);
+    }
+    electro.draw()
+    if(camion.collision(electro)){
+      score++;
+    }
   })
 }
 
 function generateChavoTamal(){
-  if(!(frames % 300 === 0)) return;
+  if(!(frames % 600 === 0)) return;
   var chavoTamal = new ChavoTamal(Math.floor(Math.random() * 100) + 230);
   chavoTamalArr.push(chavoTamal);
 }
@@ -182,6 +254,9 @@ function drawChavoTamal(){
       return chavoTamalArr.splice(index, 1);
     }
     chavo.draw();
+    if(camion.collision(chavo)){
+      gameOver();
+    }
   })
 }
 
@@ -193,20 +268,59 @@ function update(){
   background.score();
   background.time();
   background.healthBar();
+  background.audio();
   generateChavoTamal();
-  drawChavoTamal();
   camion.draw();
-  generateElectrodomesticos();
-  drawElectrodomesticos();
-}
-
-function restart(){
-  
+  camion.audio();
+  generateElectrodomesticosHor();
+  drawElectrodomesticosHor();
+  generateElectrodomesticosVer();
+  drawElectrodomesticosVer();
+  generateElectrodomesticosSqr();
+  drawElectrodomesticosSqr();
+  drawChavoTamal();
 }
 
 function startGame(){
   if(interval !== undefined) return;
   interval = setInterval(update, 1000/60)
+}
+
+function gameOver(){
+  audioColchones.pause();
+  mainTheme.pause();
+  clearInterval(interval);
+  interval = undefined
+  example = false
+  creditsInterval = setInterval(function(){
+    if(!example){
+    frames++
+    credits.draw();
+    }
+  },1000/60)
+}
+
+function restart(){
+  console.log('fin')
+  if(interval !== undefined) return;
+    score = 0;
+    time = 0;
+    frames = 0;
+    interval = undefined;
+    creditsInterval = undefined;
+    electrodomesticos = [];
+    chavoTamalArr = [];
+    camion.x = 100;
+    camion.y = 310;
+    background.x = 0;
+    background.y = 0;
+    mainTheme.currentTime = 0;
+    audioColchones.currentTime = 0;
+    clearInterval(creditsInterval);
+    creditsInterval = undefined;
+    example = true
+    credits = new Credits()
+    startGame();
 }
 
 addEventListener("keydown", function(e){
@@ -215,4 +329,5 @@ addEventListener("keydown", function(e){
   if(e.keyCode === 37){camion.moveBackwards(); camion.image.src = "./images/Camion 1 left.png"; background.x++}
   if(e.keyCode === 38){camion.moveUp()}
   if(e.keyCode === 40){camion.moveDown()}
+  if(e.keyCode === 82){restart()}
 })

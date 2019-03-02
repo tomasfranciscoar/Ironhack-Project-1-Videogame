@@ -14,6 +14,8 @@ onePlayer.onclick = function(){
 menuButton.onclick = function(){
   // score = 0;
   clearInterval(interval);
+  mainTheme.pause();
+  audioColchones.pause();
   mainGame.setAttribute("class", "main-game-off");
   mainPannel.setAttribute("class", "main-pannel main-pannel-on")
 }

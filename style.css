@@ -22,7 +22,7 @@ body {
 
 .main-pannel {
   text-align: center;
-  margin-top: 10%;
+  margin-top: 8%;
 }
 
 .main-pannel h1 {
@@ -82,7 +82,7 @@ body {
 }
 
 .main-game-on {
-  margin-top:200px;
+  margin-top:120px;
 }
 
 .button {
@@ -93,6 +93,7 @@ body {
   font-size: 20px;
   padding: 7px;
   border-style: groove;
+  cursor: pointer;
 }
 
 .game-nav {
