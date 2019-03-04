@@ -13,14 +13,27 @@ var jefaHealth = 100;
 var electrodomesticos = [];
 var creditsInterval;
 var example = true
+var fierrosViejos;
 
 var mainTheme = new Audio();
-mainTheme.src = "./Sounds/Tetris - A-Type Music (version 1.0).mp3";
+mainTheme.src = "./Sounds/Super Mario World - Underground.mp3";
 mainTheme.loop = true;
 
 var audioColchones = new Audio();
-audioColchones.src = "./Sounds/SeCompranColchones.m4a"
+audioColchones.src = "./Sounds/SeCompranColchones.m4a";
 audioColchones.loop = true;
+
+var audioGameOver = new Audio();
+audioGameOver.src = "./Sounds/Super Mario World - Game Over.mp3";
+audioGameOver.loop = false;
+
+var audioGetElectro = new Audio();
+audioGetElectro.src = "./Sounds/Super Mario World - Nintendo Logo.mp3";
+audioGetElectro.loop = false;
+
+var audioExplosion = new Audio();
+audioExplosion.src = "./Sounds/Explosion.m4a";
+audioExplosion.loop = false;
 
 class Background{
   constructor(){
@@ -49,12 +62,9 @@ class Background{
     ctx.globalAlpha = 1.0;
   }
   audio(){
-    // mainTheme.play();
+    mainTheme.play();
   }
   draw(){
-    // ctx.fillStyle = grey;
-    // ctx.fillRect(0,0,canvas.width,canvas.height);
-    // this.x--
     if(this.x > 0) this.x = 0;
     if(this.x < -(canvas.width*2)) this.x = 0;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
@@ -106,7 +116,7 @@ class Camion{
       background.x -= 3
     };
     if(this.y < 220) this.y = 220;
-    if(this.y > 370) this.y = 370;
+    if(this.y > canvas.height - this.height) this.y = canvas.height - this.height;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
@@ -179,8 +189,14 @@ class FierrosViejos{
     this.image = new Image();
     this.image.src = "./images/fierroViejo.png"
   }
+  collision(item){
+    return (this.x < item.x + item.width) &&
+        (this.x + this.width > item.x) &&
+        (this.y < item.y + item.height) &&
+        (this.y + this.height > item.y);
+  }
   draw(){
-    this.x++;
+    this.x += 4;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
@@ -215,21 +231,9 @@ class HealthBar{
 
 var healthBar = new HealthBar();
 
-// healthBar(){
-//   ctx.image100 = new Image();
-//   ctx.image100.src = "./images/HB 100.png";
-//   ctx.image075 = new Image();
-//   ctx.image075.src = "./images/HB 075.png";
-//   ctx.image050 = new Image();
-//   ctx.image050.src = "./images/HB 050.png";
-//   ctx.image025 = new Image();
-//   ctx.image025.src = "./images/HB 025.png";
-//   ctx.drawImage(ctx.image100, 540, 31, 200, 20);
-// }
-
 function generateFierrosViejos(){
   if(!(frames % 60 === 0)) return;
-  let fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + 30)
+  fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + 30)
   fierrosViejosArr.push(fierrosViejos)
 }
 
@@ -257,6 +261,8 @@ function drawElectrodomesticosHor(){
     electro.draw()
     if(camion.collision(electro)){
       score++;
+      electrodomesticos.splice(index, 1)
+      audioGetElectro.play()
     }
   })
 }
@@ -276,6 +282,8 @@ function drawElectrodomesticosSqr(){
     electro.draw()
     if(camion.collision(electro)){
       score++;
+      electrodomesticos.splice(index, 1)
+      audioGetElectro.play()
     }
   })
 }
@@ -295,6 +303,8 @@ function drawElectrodomesticosVer(){
     electro.draw()
     if(camion.collision(electro)){
       score++;
+      electrodomesticos.splice(index, 1)
+      audioGetElectro.play()
     }
   })
 }
@@ -314,6 +324,8 @@ function drawChavoTamal(){
     if(camion.collision(chavo)){
       camionHealth--;
     }
+    if(fierrosViejos.collision(chavo))
+      chavoTamalArr.splice(index, 1);
   })
 }
 
@@ -349,6 +361,7 @@ function startGame(){
 function gameOver(){
   audioColchones.pause();
   mainTheme.pause();
+  audioGameOver.play();
   clearInterval(interval);
   interval = undefined;
   example = false;
@@ -384,9 +397,28 @@ function restart(){
 
 addEventListener("keydown", function(e){
   // if(e.keyCode === 32){camion.jump()}
-  if(e.keyCode === 39){camion.moveForward(); camion.image.src = "./images/Camion 1 right.png"; background.x--}
-  if(e.keyCode === 37){camion.moveBackwards(); camion.image.src = "./images/Camion 1 left.png"; background.x++}
+  if(e.keyCode === 39){camion.moveForward(); background.x--; if(score <= 10){
+    camion.image.src = "./images/Camion 1 right.png";
+  } else if(score > 10 && score <= 20){
+    camion.image.src = "./images/Camion semi lleno right.png";
+    camion.height = 90;
+  } else if(score > 20){
+    camion.image.src = "./images/Camion lleno right.png";
+    camion.height = 100
+  }
+}
+  if(e.keyCode === 37){camion.moveBackwards(); background.x++; if( score <= 10){
+    camion.image.src = "./images/Camion 1 left.png";
+  } else if(score > 10 && score <= 20){
+    camion.image.src = "./images/Camion semi lleno left.png";
+    camion.height = 90
+  } else if(score > 20){
+    camion.image.src = "./images/Camion lleno left.png";
+    camion.height = 100;
+  }
+}
   if(e.keyCode === 38){camion.moveUp()}
   if(e.keyCode === 40){camion.moveDown()}
   if(e.keyCode === 82){restart()};
+  if(e.keyCode === 71){gameOver()}
 })
