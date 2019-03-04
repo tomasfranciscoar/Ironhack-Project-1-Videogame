@@ -1,15 +1,14 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-// ctx.fillRect(0,0,canvas.width,canvas.height);
-
 var frames = 0;
 var interval;
 // var gravity = 2;
 var score = 0;
 var time = 0;
+var fierrosViejosArr = [];
 var chavoTamalArr = [];
-var camionHealth = 100;
+var camionHealth = 1000;
 var jefaHealth = 100;
 var electrodomesticos = [];
 var creditsInterval;
@@ -42,12 +41,6 @@ class Background{
     ctx.font = "15px pixelart";
     ctx.fillStyle = "white";
     ctx.fillText("SCORE: " + score, 60, 50)
-  }
-  healthBar(){
-    ctx.image = new Image();
-    ctx.image.src = "./images/HB 075.png"
-    ctx.drawImage(ctx.image, 540, 31, 200, 20);
-
   }
   infoNavBar(){
     ctx.fillStyle = "black";
@@ -100,6 +93,11 @@ class Camion{
     if(!(frames % 3600 === 0)) {audioColchones.play()
     } else {
       audioColchones.pause()}
+  }
+  health(){
+    if(camionHealth === 0){
+      gameOver()
+    }
   }
   draw(){
     if(this.x < 0) this.x = 0;
@@ -160,6 +158,8 @@ class Credits{
       ctx.fillStyle = "white";
       ctx.font = "30px pixelart";
       ctx.fillText("GAME OVER", 270, this.y)
+      ctx.font = "10px pixelart";
+      ctx.fillText("(Press R to restart)", 308, this.y + 30);
       ctx.font = "15px pixelart";
       ctx.fillText("PROGRAMMING: TOMAS FREIRE", 210, this.y + 100);
       ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 150)
@@ -170,20 +170,77 @@ var background = new Background();
 var camion = new Camion();
 var credits = new Credits();
 
-// class FierrosViejos{
-//   constructor(){
-//     this.x = camion.x;
-//     this.y = camion.y;
-//     this.width = 50;
-//     this.height = 5;
-//     this.image = new Image();
-//     this.image.src = "./images/fierroViejo.png"
-//   }
-//   draw(){
-//     this.x++;
-//     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-//   }
+class FierrosViejos{
+  constructor(x, y){
+    this.x = x;
+    this.y = y;
+    this.width = 50;
+    this.height = 5;
+    this.image = new Image();
+    this.image.src = "./images/fierroViejo.png"
+  }
+  draw(){
+    this.x++;
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+  }
+}
+
+class HealthBar{
+  constructor(){
+    this.x = 540;
+    this.y = 31;
+    this.width = 200;
+    this.height = 20;
+    this.image100 = new Image();
+    this.image100.src = "./images/HB 100.png";
+    this.image075 = new Image();
+    this.image075.src = "./images/HB 075.png";
+    this.image050 = new Image();
+    this.image050.src = "./images/HB 050.png";
+    this.image025 = new Image();
+    this.image025.src = "./images/HB 025.png";
+  }
+  draw(){
+    if(camionHealth >= 751){
+      ctx.drawImage(this.image100, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 501 ){
+      ctx.drawImage(this.image075, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 251){
+      ctx.drawImage(this.image050, this.x, this.y, this.width, this.height)
+    } else if(camionHealth <= 250){
+      ctx.drawImage(this.image025, this.x, this.y, this.width, this.height)
+    }
+  }
+}
+
+var healthBar = new HealthBar();
+
+// healthBar(){
+//   ctx.image100 = new Image();
+//   ctx.image100.src = "./images/HB 100.png";
+//   ctx.image075 = new Image();
+//   ctx.image075.src = "./images/HB 075.png";
+//   ctx.image050 = new Image();
+//   ctx.image050.src = "./images/HB 050.png";
+//   ctx.image025 = new Image();
+//   ctx.image025.src = "./images/HB 025.png";
+//   ctx.drawImage(ctx.image100, 540, 31, 200, 20);
 // }
+
+function generateFierrosViejos(){
+  if(!(frames % 60 === 0)) return;
+  let fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + 30)
+  fierrosViejosArr.push(fierrosViejos)
+}
+
+function drawFierrosViejos(){
+  fierrosViejosArr.forEach((fierros, index) => {
+    if(fierros.x > canvas.width || fierros.x < 0 - canvas.width){
+      return fierrosViejosArr.splice(index, 1);
+    }
+    fierros.draw();
+  })
+}
 
 function generateElectrodomesticosHor(){
   if(!(frames % 350 === 0)) return;
@@ -255,7 +312,7 @@ function drawChavoTamal(){
     }
     chavo.draw();
     if(camion.collision(chavo)){
-      gameOver();
+      camionHealth--;
     }
   })
 }
@@ -267,17 +324,20 @@ function update(){
   background.infoNavBar();
   background.score();
   background.time();
-  background.healthBar();
   background.audio();
   generateChavoTamal();
   camion.draw();
   camion.audio();
+  healthBar.draw();
   generateElectrodomesticosHor();
   drawElectrodomesticosHor();
   generateElectrodomesticosVer();
   drawElectrodomesticosVer();
   generateElectrodomesticosSqr();
   drawElectrodomesticosSqr();
+  generateFierrosViejos();
+  drawFierrosViejos();
+  camion.health();
   drawChavoTamal();
 }
 
@@ -290,18 +350,17 @@ function gameOver(){
   audioColchones.pause();
   mainTheme.pause();
   clearInterval(interval);
-  interval = undefined
-  example = false
+  interval = undefined;
+  example = false;
   creditsInterval = setInterval(function(){
     if(!example){
-    frames++
+    frames++;
     credits.draw();
     }
   },1000/60)
 }
 
 function restart(){
-  console.log('fin')
   if(interval !== undefined) return;
     score = 0;
     time = 0;
@@ -329,5 +388,5 @@ addEventListener("keydown", function(e){
   if(e.keyCode === 37){camion.moveBackwards(); camion.image.src = "./images/Camion 1 left.png"; background.x++}
   if(e.keyCode === 38){camion.moveUp()}
   if(e.keyCode === 40){camion.moveDown()}
-  if(e.keyCode === 82){restart()}
+  if(e.keyCode === 82){restart()};
 })
