@@ -15,6 +15,7 @@ var creditsInterval;
 var example = true
 var fierrosViejos;
 var tamalesArr = [];
+var tamalesFinalesArr = [];
 
 var mainTheme = new Audio();
 mainTheme.src = "./Sounds/Super Mario World - Underground.mp3";
@@ -150,6 +151,12 @@ class ChavoTamal{
     this.image = new Image();
     this.image.src = "./images/Bici 1 left.png";
   }
+  collision(item){
+    return (this.x < item.x + item.width) &&
+        (this.x + this.width > item.x) &&
+        (this.y < item.y + item.height) &&
+        (this.y + this.height > item.y);
+  }
   draw(){
     this.x--;
     if(time >= 50) this.x--;
@@ -202,19 +209,34 @@ class FierrosViejos{
         (this.y + this.height > item.y);
   }
   draw(){
-    this.x += 4;
+    this.x += 8;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
 
 class Tamales{
   constructor(){
-    this.x = chavoTamalArr[chavoTamalArr.length - 1].x;
-    this.y = chavoTamalArr[chavoTamalArr.length - 1].y;
+    this.x = chavoTamalArr[0].x;
+    this.y = chavoTamalArr[0].y;
     this.width = 10;
     this.height = 5;
     this.image = new Image();
     this.image.src = "./images/Tamal.png"
+  }
+  draw(){
+      this.x -= 3;
+      ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
+  }
+}
+
+class TamalesFinales{
+  constructor(){
+    this.x = canvas.width;
+    this.y = Math.floor(Math.random() * canvas.height + 50);
+    this.width = 10;
+    this.height = 5;
+    this.image = new Image();
+    this.image.src = "./images/Tamal.png";
   }
   draw(){
     this.x -= 3;
@@ -283,25 +305,6 @@ class JefaFinal{
 
 var jefaFinal = new JefaFinal();
 var healthBar = new HealthBar();
-
-function generateFierrosViejos(){
-  if(!(frames % 60 === 0)) return;
-  fierrosViejosEmpty = new FierrosViejos(camion.x + 120, camion.y + 30)
-  fierrosViejosMid = new FierrosViejos(camion.x + 120, camion.y + 50)
-  fierrosViejosFull = new FierrosViejos(camion.x + 120, camion.y + 70)
-  addEventListener("keydown", function(e){
-    if(e.keyCode === 32){
-      audioExplosion.play();
-      if(score <= 10){
-        fierrosViejosArr.push(fierrosViejosEmpty)
-      } else if(score > 10 && score <= 20){
-        fierrosViejosArr.push(fierrosViejosMid)
-      } else if(score > 20){
-        fierrosViejosArr.push(fierrosViejosFull)
-      }
-    }
-  })
-}
 
 function drawFierrosViejos(){
   fierrosViejosArr.forEach((fierros, index) => {
@@ -376,7 +379,7 @@ function drawElectrodomesticosVer(){
 }
 
 function generateChavoTamal(){
-  if(!(frames % 600 === 0)) return;
+  if(!(frames % 180 === 0)) return;
   var chavoTamal = new ChavoTamal(Math.floor(Math.random() * 100) + 230);
   chavoTamalArr.push(chavoTamal);
 }
@@ -389,22 +392,18 @@ function drawChavoTamal(){
     if(score <=50){
       chavo.draw()
     }
-    if(camion.collision(chavo)){
+    if(chavo.collision(camion)){
       camionHealth--;
     }
-    if(fierrosViejosEmpty.collision(chavo))
-      chavoTamalArr.splice(index, 1);
-    if(fierrosViejosMid.collision(chavo))
-      chavoTamalArr.splice(index, 1);
-    if(fierrosViejosFull.collision(chavo))
+    if(chavo.collision(fierrosViejos))
       chavoTamalArr.splice(index, 1);
   })
 }
 
 function generateTamales(){
   if(!(frames % 180 === 0)) return;
-  tamales = new Tamales();
-  tamalesArr.push(tamales)
+    tamales = new Tamales();
+    tamalesArr.push(tamales)
 }
 
 function drawTamales(){
@@ -415,6 +414,29 @@ function drawTamales(){
     if(score <= 50){
       tamal.draw()
     }
+    if(camion.collision(tamal)){
+      camionHealth--;
+    }
+  })
+}
+
+function generateTamalesFinales(){
+  if(frames % 60 === 0){
+    tamalesFinales = new TamalesFinales();
+    tamalesFinalesArr.push(tamalesFinales)
+  }
+}
+
+function drawTamalesFinales(){
+  tamalesFinalesArr.forEach( (superTamales, index) => {
+    if(superTamales.x < 0 - superTamales.width){
+      return tamalesFinalesArr.splice(index, 1)
+    }
+    if(score > 50){
+      superTamales.draw()
+    }
+    if(camion.collision(superTamales))
+      camionHealth--
   })
 }
 
@@ -439,8 +461,9 @@ function update(){
   generateTamales();
   drawTamales();
   jefaFinal.draw();
-  generateFierrosViejos();
   drawFierrosViejos();
+  generateTamalesFinales();
+  drawTamalesFinales();
   camion.health();
   drawChavoTamal();
 }
@@ -477,6 +500,8 @@ function restart(){
     chavoTamalArr = [];
     camion.x = 100;
     camion.y = 310;
+    camion.height = 70;
+    camionHealth = 1000;
     background.x = 0;
     background.y = 0;
     mainTheme.currentTime = 0;
@@ -515,4 +540,8 @@ addEventListener("keydown", function(e){
   if(e.keyCode === 82){restart()};
   if(e.keyCode === 71){gameOver()};
   if(e.keyCode === 67){score = 51};
+  if(e.keyCode === 32){
+    audioExplosion.play();
+    fierrosViejosArr.push(fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + camion.height - 40))
+  }
 })
