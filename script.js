@@ -14,6 +14,7 @@ var electrodomesticos = [];
 var creditsInterval;
 var example = true
 var fierrosViejos;
+var tamalesArr = [];
 
 var mainTheme = new Audio();
 mainTheme.src = "./Sounds/Super Mario World - Underground.mp3";
@@ -34,6 +35,10 @@ audioGetElectro.loop = false;
 var audioExplosion = new Audio();
 audioExplosion.src = "./Sounds/Explosion.m4a";
 audioExplosion.loop = false;
+
+var audioBoss = new Audio();
+audioBoss.src = "./Sounds/Super Mario World - Boss Battle.mp3";
+audioBoss.loop = true;
 
 class Background{
   constructor(){
@@ -172,7 +177,8 @@ class Credits{
       ctx.fillText("(Press R to restart)", 308, this.y + 30);
       ctx.font = "15px pixelart";
       ctx.fillText("PROGRAMMING: TOMAS FREIRE", 210, this.y + 100);
-      ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 150)
+      ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 140);
+      ctx.fillText("MENTORS: Deivid, Foggy & Kain", 180, this.y + 180)
   }
 }
 
@@ -198,6 +204,21 @@ class FierrosViejos{
   draw(){
     this.x += 4;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+  }
+}
+
+class Tamales{
+  constructor(){
+    this.x = chavoTamalArr[chavoTamalArr.length - 1].x;
+    this.y = chavoTamalArr[chavoTamalArr.length - 1].y;
+    this.width = 10;
+    this.height = 5;
+    this.image = new Image();
+    this.image.src = "./images/Tamal.png"
+  }
+  draw(){
+    this.x -= 3;
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
   }
 }
 
@@ -229,12 +250,57 @@ class HealthBar{
   }
 }
 
+class JefaFinal{
+  constructor(){
+    this.x = canvas.width;
+    this.y = 250;
+    this.width = 80;
+    this.height = 150;
+    this.image1 = new Image();
+    this.image1.src = "./images/Jefa 1 left.png";
+    this.image2 = new Image();
+    this.image2.src = "./images/Jefa 2 left.png";
+    this.image3 = new Image();
+    this.image3.src = "./images/Jefa 3 left.png";
+    this.image4 = new Image();
+    this.image4.src = "./images/Jefa 4 left.png";
+    this.image = this.image1;
+  }
+  draw(){
+    if(score > 50){
+      audioColchones.pause();
+      mainTheme.pause();
+      audioBoss.play();
+      this.x--
+      if(this.x < 400) this.x = 400;
+      // if(frames % 30 === 0){
+      //   this.image = this.image == this.image1 ? this.image2 : this.image1;
+      // }
+      ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
+  }
+}
+
+var jefaFinal = new JefaFinal();
 var healthBar = new HealthBar();
 
 function generateFierrosViejos(){
   if(!(frames % 60 === 0)) return;
-  fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + 30)
-  fierrosViejosArr.push(fierrosViejos)
+  fierrosViejosEmpty = new FierrosViejos(camion.x + 120, camion.y + 30)
+  fierrosViejosMid = new FierrosViejos(camion.x + 120, camion.y + 50)
+  fierrosViejosFull = new FierrosViejos(camion.x + 120, camion.y + 70)
+  addEventListener("keydown", function(e){
+    if(e.keyCode === 32){
+      audioExplosion.play();
+      if(score <= 10){
+        fierrosViejosArr.push(fierrosViejosEmpty)
+      } else if(score > 10 && score <= 20){
+        fierrosViejosArr.push(fierrosViejosMid)
+      } else if(score > 20){
+        fierrosViejosArr.push(fierrosViejosFull)
+      }
+    }
+  })
 }
 
 function drawFierrosViejos(){
@@ -320,12 +386,35 @@ function drawChavoTamal(){
     if(chavo.x < -130){
       return chavoTamalArr.splice(index, 1);
     }
-    chavo.draw();
+    if(score <=50){
+      chavo.draw()
+    }
     if(camion.collision(chavo)){
       camionHealth--;
     }
-    if(fierrosViejos.collision(chavo))
+    if(fierrosViejosEmpty.collision(chavo))
       chavoTamalArr.splice(index, 1);
+    if(fierrosViejosMid.collision(chavo))
+      chavoTamalArr.splice(index, 1);
+    if(fierrosViejosFull.collision(chavo))
+      chavoTamalArr.splice(index, 1);
+  })
+}
+
+function generateTamales(){
+  if(!(frames % 180 === 0)) return;
+  tamales = new Tamales();
+  tamalesArr.push(tamales)
+}
+
+function drawTamales(){
+  tamalesArr.forEach( (tamal, index) => {
+    if(tamal.x < 0 - tamales.width){
+      return tamalesArr.splice(index, 1)
+    }
+    if(score <= 50){
+      tamal.draw()
+    }
   })
 }
 
@@ -347,6 +436,9 @@ function update(){
   drawElectrodomesticosVer();
   generateElectrodomesticosSqr();
   drawElectrodomesticosSqr();
+  generateTamales();
+  drawTamales();
+  jefaFinal.draw();
   generateFierrosViejos();
   drawFierrosViejos();
   camion.health();
@@ -361,6 +453,7 @@ function startGame(){
 function gameOver(){
   audioColchones.pause();
   mainTheme.pause();
+  audioBoss.pause();
   audioGameOver.play();
   clearInterval(interval);
   interval = undefined;
@@ -420,5 +513,6 @@ addEventListener("keydown", function(e){
   if(e.keyCode === 38){camion.moveUp()}
   if(e.keyCode === 40){camion.moveDown()}
   if(e.keyCode === 82){restart()};
-  if(e.keyCode === 71){gameOver()}
+  if(e.keyCode === 71){gameOver()};
+  if(e.keyCode === 67){score = 51};
 })
