@@ -8,10 +8,11 @@ var score = 0;
 var time = 0;
 var fierrosViejosArr = [];
 var chavoTamalArr = [];
+var chavoTamal;
 var camionHealth = 1000;
 var jefaHealth = 100;
 var electrodomesticos = [];
-var creditsInterval;
+var creditsLoseInterval;
 var example = true
 var fierrosViejos;
 var tamalesArr = [];
@@ -40,6 +41,10 @@ audioExplosion.loop = false;
 var audioBoss = new Audio();
 audioBoss.src = "./Sounds/Super Mario World - Boss Battle.mp3";
 audioBoss.loop = true;
+
+var audioWinner = new Audio();
+audioWinner.src = "./Sounds/Super Mario World - Invincible.mp3";
+audioWinner.loop = false;
 
 class Background{
   constructor(){
@@ -187,6 +192,19 @@ class Credits{
       ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 140);
       ctx.fillText("MENTORS: Deivid, Foggy & Kain", 180, this.y + 180)
   }
+  drawWin(){
+    this.y--
+      if(this.y < 160) this.y = 160;
+      ctx.fillStyle = "black";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "30px pixelart";
+      ctx.fillText("YOU WON!", 290, this.y)
+      ctx.font = "15px pixelart";
+      ctx.fillText("PROGRAMMING: TOMAS FREIRE", 210, this.y + 100);
+      ctx.fillText("DESIGN: JOSEFINA FREIRE & AGUSTIN GALESI", 100, this.y + 140);
+      ctx.fillText("MENTORS: Deivid, Foggy & Kain", 180, this.y + 180)
+  }
 }
 
 var background = new Background();
@@ -288,6 +306,11 @@ class JefaFinal{
     this.image4.src = "./images/Jefa 4 left.png";
     this.image = this.image1;
   }
+  health(){
+    if(jefaHealth < 0){
+      winner();
+    }
+  }
   draw(){
     if(score > 50){
       audioColchones.pause();
@@ -312,6 +335,9 @@ function drawFierrosViejos(){
       return fierrosViejosArr.splice(index, 1);
     }
     fierros.draw();
+    if(fierros.collision(jefaFinal)){
+      jefaHealth--;
+    }
   })
 }
 
@@ -350,7 +376,7 @@ function drawElectrodomesticosSqr(){
     }
     electro.draw()
     if(camion.collision(electro)){
-      score++;
+      score += 2;
       electrodomesticos.splice(index, 1)
       audioGetElectro.play()
     }
@@ -371,7 +397,7 @@ function drawElectrodomesticosVer(){
     }
     electro.draw()
     if(camion.collision(electro)){
-      score++;
+      score += 3;
       electrodomesticos.splice(index, 1)
       audioGetElectro.play()
     }
@@ -380,7 +406,7 @@ function drawElectrodomesticosVer(){
 
 function generateChavoTamal(){
   if(!(frames % 180 === 0)) return;
-  var chavoTamal = new ChavoTamal(Math.floor(Math.random() * 100) + 230);
+  chavoTamal = new ChavoTamal(Math.floor(Math.random() * 100) + 230);
   chavoTamalArr.push(chavoTamal);
 }
 
@@ -465,6 +491,7 @@ function update(){
   generateTamalesFinales();
   drawTamalesFinales();
   camion.health();
+  jefaFinal.health();
   drawChavoTamal();
 }
 
@@ -481,10 +508,26 @@ function gameOver(){
   clearInterval(interval);
   interval = undefined;
   example = false;
-  creditsInterval = setInterval(function(){
+  creditsLoseInterval = setInterval(function(){
     if(!example){
     frames++;
     credits.draw();
+    }
+  },1000/60)
+}
+
+function winner(){
+  audioColchones.pause();
+  mainTheme.pause();
+  audioBoss.pause();
+  audioWinner.play();
+  clearInterval(interval);
+  interval = undefined;
+  example = false;
+  creditsWinInterval = setInterval(function(){
+    if(!example){
+    frames++;
+    credits.drawWin();
     }
   },1000/60)
 }
@@ -495,7 +538,7 @@ function restart(){
     time = 0;
     frames = 0;
     interval = undefined;
-    creditsInterval = undefined;
+    creditsLoseInterval = undefined;
     electrodomesticos = [];
     chavoTamalArr = [];
     camion.x = 100;
@@ -506,8 +549,8 @@ function restart(){
     background.y = 0;
     mainTheme.currentTime = 0;
     audioColchones.currentTime = 0;
-    clearInterval(creditsInterval);
-    creditsInterval = undefined;
+    clearInterval(creditsLoseInterval);
+    creditsLoseInterval = undefined;
     example = true
     credits = new Credits()
     startGame();
@@ -539,6 +582,7 @@ addEventListener("keydown", function(e){
   if(e.keyCode === 40){camion.moveDown()}
   if(e.keyCode === 82){restart()};
   if(e.keyCode === 71){gameOver()};
+  if(e.keyCode === 87){winner()};
   if(e.keyCode === 67){score = 51};
   if(e.keyCode === 32){
     audioExplosion.play();
