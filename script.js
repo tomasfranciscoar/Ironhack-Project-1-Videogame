@@ -10,7 +10,7 @@ var fierrosViejosArr = [];
 var chavoTamalArr = [];
 var chavoTamal;
 var camionHealth = 1000;
-var jefaHealth = 100;
+var jefaHealth = 300;
 var electrodomesticos = [];
 var creditsLoseInterval;
 var example = true
@@ -227,7 +227,7 @@ class FierrosViejos{
         (this.y + this.height > item.y);
   }
   draw(){
-    this.x += 8;
+    this.x += 8; 
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
@@ -243,7 +243,7 @@ class Tamales{
   }
   draw(){
       this.x -= 3;
-      ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
+      ctx.drawImage(this.image, this.x + 40, this.y + 35, this.width, this.height)
   }
 }
 
@@ -316,11 +316,10 @@ class JefaFinal{
       audioColchones.pause();
       mainTheme.pause();
       audioBoss.play();
-      this.x--
-      if(this.x < 400) this.x = 400;
-      // if(frames % 30 === 0){
-      //   this.image = this.image == this.image1 ? this.image2 : this.image1;
-      // }
+      if(this.x > 400) this.x--;
+      if(frames % 30 === 0){
+        this.image = this.image == this.image1 ? this.image2 : this.image1;
+      }
       ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
   }
@@ -498,6 +497,20 @@ function update(){
 function startGame(){
   if(interval !== undefined) return;
   interval = setInterval(update, 1000/60)
+}
+
+function updateTwoPlayers(){
+  frames++;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  background.draw();
+  background.infoNavBar();
+  background.time();
+  background.audio();
+}
+
+function startGameTwoPlayers(){
+  if(intervalTwoPlayers !== undefined) return;
+  intervalTwoPlayers = setInterval(updateTwoPlayers, 1000/60)
 }
 
 function gameOver(){
