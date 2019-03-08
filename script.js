@@ -3,7 +3,6 @@ var ctx = canvas.getContext("2d");
 
 var frames = 0;
 var interval;
-// var gravity = 2;
 var score = 0;
 var time = 0;
 var fierrosViejosArr = [];
@@ -45,6 +44,7 @@ audioBoss.loop = true;
 var audioWinner = new Audio();
 audioWinner.src = "./Sounds/Super Mario World - Invincible.mp3";
 audioWinner.loop = false;
+
 
 class Background{
   constructor(){
@@ -93,16 +93,16 @@ class Camion{
     this.image.src = "./images/Camion 1 right.png"
   }
   moveForward(){
-    this.x += 4
+    this.x += 8
   }
   moveBackwards(){
-    this.x -= 4
+    this.x -= 8
   }
   moveUp(){
-    this.y -= 4
+    this.y -= 8
   }
   moveDown(){
-    this.y += 4
+    this.y += 8
   }
   collision(item){
     return (this.x < item.x + item.width) &&
@@ -270,22 +270,46 @@ class HealthBar{
     this.height = 20;
     this.image100 = new Image();
     this.image100.src = "./images/HB 100.png";
-    this.image075 = new Image();
-    this.image075.src = "./images/HB 075.png";
+    this.image090 = new Image();
+    this.image090.src = "./images/HB 090.png";
+    this.image080 = new Image();
+    this.image080.src = "./images/HB 080.png";
+    this.image070 = new Image();
+    this.image070.src = "./images/HB 070.png";
+    this.image060 = new Image();
+    this.image060.src = "./images/HB 060.png";
     this.image050 = new Image();
     this.image050.src = "./images/HB 050.png";
-    this.image025 = new Image();
-    this.image025.src = "./images/HB 025.png";
+    this.image040 = new Image();
+    this.image040.src = "./images/HB 040.png";
+    this.image030 = new Image();
+    this.image030.src = "./images/HB 030.png";
+    this.image020 = new Image();
+    this.image020.src = "./images/HB 020.png";
+    this.image010 = new Image();
+    this.image010.src = "./images/HB 010.png";
   }
   draw(){
-    if(camionHealth >= 751){
+    if(camionHealth >= 901){
       ctx.drawImage(this.image100, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 801 ){
+      ctx.drawImage(this.image090, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 701){
+      ctx.drawImage(this.image080, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 601){
+      ctx.drawImage(this.image070, this.x, this.y, this.width, this.height)
     } else if(camionHealth >= 501 ){
-      ctx.drawImage(this.image075, this.x, this.y, this.width, this.height)
-    } else if(camionHealth >= 251){
+      ctx.drawImage(this.image060, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 401){
       ctx.drawImage(this.image050, this.x, this.y, this.width, this.height)
-    } else if(camionHealth <= 250){
-      ctx.drawImage(this.image025, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 301){
+      ctx.drawImage(this.image040, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 201 ){
+      ctx.drawImage(this.image030, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 101){
+      ctx.drawImage(this.image020, this.x, this.y, this.width, this.height)
+    } else if(camionHealth <= 100){
+      ctx.drawImage(this.image010, this.x, this.y, this.width, this.height)
     }
   }
 }
@@ -304,7 +328,7 @@ class JefaFinal{
     this.image3.src = "./images/Jefa 3 left.png";
     this.image4 = new Image();
     this.image4.src = "./images/Jefa 4 left.png";
-    this.image = this.image1;
+    this.image = this.image3;
   }
   health(){
     if(jefaHealth < 0){
@@ -318,7 +342,7 @@ class JefaFinal{
       audioBoss.play();
       if(this.x > 400) this.x--;
       if(frames % 30 === 0){
-        this.image = this.image == this.image1 ? this.image2 : this.image1;
+        this.image = this.image == this.image3 ? this.image4 : this.image3;
       }
       ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
@@ -558,6 +582,9 @@ function restart(){
     camion.y = 310;
     camion.height = 70;
     camionHealth = 1000;
+    tamalesArr = [];
+    audioGameOver.pause();
+    tamalesFinalesArr = [];
     background.x = 0;
     background.y = 0;
     mainTheme.currentTime = 0;
