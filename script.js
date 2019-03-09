@@ -3,16 +3,20 @@ var ctx = canvas.getContext("2d");
 
 var frames = 0;
 var interval;
+var intervalTwoPlayers;
 var score = 0;
 var time = 0;
 var fierrosViejosArr = [];
 var chavoTamalArr = [];
 var chavoTamal;
 var camionHealth = 1000;
+var chavoTamalesHealth = 1000;
 var jefaHealth = 300;
 var electrodomesticos = [];
 var creditsLoseInterval;
-var example = true
+var creditsWinInterval;
+var exampleLose = true
+var exampleWin = true
 var fierrosViejos;
 var tamalesArr = [];
 var tamalesFinalesArr = [];
@@ -91,18 +95,21 @@ class Camion{
     this.height = 70;
     this.image = new Image();
     this.image.src = "./images/Camion 1 right.png"
+    this.image1 = new Image();
+    this.image1.src = "./images/Camion 2 right.png"
+    this.imageRight = this.image;
   }
   moveForward(){
-    this.x += 8
+    this.x += 12
   }
   moveBackwards(){
-    this.x -= 8
+    this.x -= 12
   }
   moveUp(){
-    this.y -= 8
+    this.y -= 12
   }
   moveDown(){
-    this.y += 8
+    this.y += 12
   }
   collision(item){
     return (this.x < item.x + item.width) &&
@@ -116,8 +123,16 @@ class Camion{
       audioColchones.pause()}
   }
   health(){
-    if(camionHealth === 0){
+    if(camionHealth <= 0){
       gameOver()
+    }
+  }
+  camionLoses(){
+    if(camionHealth <= 0){
+      clearInterval(intervalTwoPlayers);
+      mainTheme.pause();
+      audioWinner.play();
+      ctx.fillText("Player 2 WINS!", 300, 280);
     }
   }
   draw(){
@@ -129,6 +144,15 @@ class Camion{
     if(this.y < 220) this.y = 220;
     if(this.y > canvas.height - this.height) this.y = canvas.height - this.height;
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+  }
+  drawTwoPlayers(){
+    if(this.x < 0) this.x = 0;
+    if(this.x > canvas.width-this.width){
+      this.x = canvas.width-this.width
+    };
+    if(this.y < 220) this.y = 220;
+    if(this.y > canvas.height - this.height) this.y = canvas.height - this.height;
+    ctx.drawImage(this.image,this.x,this.y,this.width,this.height);
   }
 }
 
@@ -148,13 +172,16 @@ class Electrodomesticos{
 }
 
 class ChavoTamal{
-  constructor(y){
-    this.x = canvas.width;
+  constructor(x, y){
+    this.x = x;
     this.y = y;
     this.width = 80;
     this.height = 70;
     this.image = new Image();
     this.image.src = "./images/Bici 1 left.png";
+    this.image1 = new Image();
+    this.image1.src = "./images/Bici 2 left.png";
+    this.imagen = this.image;
   }
   collision(item){
     return (this.x < item.x + item.width) &&
@@ -162,11 +189,43 @@ class ChavoTamal{
         (this.y < item.y + item.height) &&
         (this.y + this.height > item.y);
   }
+  moveForward(){
+    this.x -= 12
+  }
+  moveBackwards(){
+    this.x += 12
+  }
+  moveUp(){
+    this.y -= 12
+  }
+  moveDown(){
+    this.y += 12
+  }
   draw(){
     this.x--;
     if(time >= 50) this.x--;
     if(time >= 150) this.x--;
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    if(frames % 30 === 0){
+      this.imagen = this.imagen == this.image ? this.image1 : this.image;
+    }
+    ctx.drawImage(this.imagen, this.x, this.y, this.width, this.height);
+  }
+  chavoLoses(){
+    if(chavoTamalesHealth <= 0){
+      clearInterval(intervalTwoPlayers);
+      mainTheme.pause();
+      audioWinner.play();
+      ctx.fillText("Player 1 WINS!", 300, 280);
+    }
+  }
+  drawTwoPlayers(){
+      if(this.x < 0) this.x = 0;
+      if(this.x > canvas.width-this.width){
+        this.x = canvas.width-this.width
+      };
+      if(this.y < 220) this.y = 220;
+      if(this.y > canvas.height - this.height) this.y = canvas.height - this.height;
+      ctx.drawImage(this.image,this.x,this.y,this.width,this.height);
   }
 }
 
@@ -210,6 +269,7 @@ class Credits{
 var background = new Background();
 var camion = new Camion();
 var credits = new Credits();
+var chavoTamalTwoPlayers = new ChavoTamal(620, 310);
 
 class FierrosViejos{
   constructor(x, y){
@@ -233,9 +293,9 @@ class FierrosViejos{
 }
 
 class Tamales{
-  constructor(){
-    this.x = chavoTamalArr[0].x;
-    this.y = chavoTamalArr[0].y;
+  constructor(x, y){
+    this.x = x;
+    this.y = y;
     this.width = 10;
     this.height = 5;
     this.image = new Image();
@@ -263,9 +323,9 @@ class TamalesFinales{
 }
 
 class HealthBar{
-  constructor(){
-    this.x = 540;
-    this.y = 31;
+  constructor(x, y){
+    this.x = x;
+    this.y = y;
     this.width = 200;
     this.height = 20;
     this.image100 = new Image();
@@ -312,6 +372,52 @@ class HealthBar{
       ctx.drawImage(this.image010, this.x, this.y, this.width, this.height)
     }
   }
+  drawPlayerOne(){
+    if(camionHealth >= 901){
+      ctx.drawImage(this.image100, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 801 ){
+      ctx.drawImage(this.image090, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 701){
+      ctx.drawImage(this.image080, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 601){
+      ctx.drawImage(this.image070, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 501 ){
+      ctx.drawImage(this.image060, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 401){
+      ctx.drawImage(this.image050, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 301){
+      ctx.drawImage(this.image040, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 201 ){
+      ctx.drawImage(this.image030, this.x, this.y, this.width, this.height)
+    } else if(camionHealth >= 101){
+      ctx.drawImage(this.image020, this.x, this.y, this.width, this.height)
+    } else if(camionHealth <= 100){
+      ctx.drawImage(this.image010, this.x, this.y, this.width, this.height)
+    }
+  }
+  drawPlayerTwo(){
+    if(chavoTamalesHealth >= 901){
+      ctx.drawImage(this.image100, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 801 ){
+      ctx.drawImage(this.image090, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 701){
+      ctx.drawImage(this.image080, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 601){
+      ctx.drawImage(this.image070, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 501 ){
+      ctx.drawImage(this.image060, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 401){
+      ctx.drawImage(this.image050, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 301){
+      ctx.drawImage(this.image040, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 201 ){
+      ctx.drawImage(this.image030, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth >= 101){
+      ctx.drawImage(this.image020, this.x, this.y, this.width, this.height)
+    } else if(chavoTamalesHealth <= 100){
+      ctx.drawImage(this.image010, this.x, this.y, this.width, this.height)
+    }
+  }
 }
 
 class JefaFinal{
@@ -350,7 +456,9 @@ class JefaFinal{
 }
 
 var jefaFinal = new JefaFinal();
-var healthBar = new HealthBar();
+var healthBar = new HealthBar(540, 31);
+var healthBarPlayerOne = new HealthBar(60, 31)
+var healthBarPlayerTwo = new HealthBar(540, 31)
 
 function drawFierrosViejos(){
   fierrosViejosArr.forEach((fierros, index) => {
@@ -360,6 +468,9 @@ function drawFierrosViejos(){
     fierros.draw();
     if(fierros.collision(jefaFinal)){
       jefaHealth--;
+    }
+    if(fierros.collision(chavoTamalTwoPlayers)){
+      chavoTamalesHealth--
     }
   })
 }
@@ -429,7 +540,7 @@ function drawElectrodomesticosVer(){
 
 function generateChavoTamal(){
   if(!(frames % 180 === 0)) return;
-  chavoTamal = new ChavoTamal(Math.floor(Math.random() * 100) + 230);
+  chavoTamal = new ChavoTamal(canvas.width, Math.floor(Math.random() * 100) + 230);
   chavoTamalArr.push(chavoTamal);
 }
 
@@ -451,7 +562,7 @@ function drawChavoTamal(){
 
 function generateTamales(){
   if(!(frames % 180 === 0)) return;
-    tamales = new Tamales();
+    tamales = new Tamales(chavoTamal.x, chavoTamal.y);
     tamalesArr.push(tamales)
 }
 
@@ -485,7 +596,7 @@ function drawTamalesFinales(){
       superTamales.draw()
     }
     if(camion.collision(superTamales))
-      camionHealth--
+      camionHealth -= .5
   })
 }
 
@@ -521,6 +632,38 @@ function update(){
 function startGame(){
   if(interval !== undefined) return;
   interval = setInterval(update, 1000/60)
+  addEventListener("keydown", function(e){
+    if(e.keyCode === 39){camion.moveForward(); background.x--; if(score <= 10){
+      camion.image.src = "./images/Camion 1 right.png";
+    } else if(score > 10 && score <= 20){
+      camion.image.src = "./images/Camion semi lleno right.png";
+      camion.height = 90;
+    } else if(score > 20){
+      camion.image.src = "./images/Camion lleno right.png";
+      camion.height = 100
+    }
+  }
+    if(e.keyCode === 37){camion.moveBackwards(); background.x++; if( score <= 10){
+      camion.image.src = "./images/Camion 1 left.png";
+    } else if(score > 10 && score <= 20){
+      camion.image.src = "./images/Camion semi lleno left.png";
+      camion.height = 90
+    } else if(score > 20){
+      camion.image.src = "./images/Camion lleno left.png";
+      camion.height = 100;
+    }
+  }
+    if(e.keyCode === 38){camion.moveUp()}
+    if(e.keyCode === 40){camion.moveDown()}
+    if(e.keyCode === 82){restart()};
+    if(e.keyCode === 71){gameOver()};
+    if(e.keyCode === 87){winner()};
+    if(e.keyCode === 67){score = 51};
+    if(e.keyCode === 32){
+      audioExplosion.play();
+      fierrosViejosArr.push(fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + camion.height - 40))
+    }
+  })
 }
 
 function updateTwoPlayers(){
@@ -530,11 +673,37 @@ function updateTwoPlayers(){
   background.infoNavBar();
   background.time();
   background.audio();
+  camion.drawTwoPlayers();
+  chavoTamalTwoPlayers.drawTwoPlayers();
+  healthBarPlayerOne.drawPlayerOne();
+  healthBarPlayerTwo.drawPlayerTwo();
+  drawFierrosViejos();
+  drawTamales();
+  camion.camionLoses();
+  chavoTamalTwoPlayers.chavoLoses();
 }
 
 function startGameTwoPlayers(){
   if(intervalTwoPlayers !== undefined) return;
-  intervalTwoPlayers = setInterval(updateTwoPlayers, 1000/60)
+  intervalTwoPlayers = setInterval(updateTwoPlayers, 1000/60);
+  addEventListener("keydown", function(e){
+    if(e.keyCode === 68){camion.moveForward(); camion.image.src = "./images/Camion 1 right.png"};
+    if(e.keyCode === 65){camion.moveBackwards(); camion.image.src = "./images/Camion 1 left.png"};
+    if(e.keyCode === 87){camion.moveUp()};
+    if(e.keyCode === 83){camion.moveDown()};
+    if(e.keyCode === 37){chavoTamalTwoPlayers.moveForward(); chavoTamalTwoPlayers.image.src = "./images/Bici 1 left.png"};
+    if(e.keyCode === 39){chavoTamalTwoPlayers.moveBackwards(); chavoTamalTwoPlayers.image.src = "./images/Bici 1 right.png"};
+    if(e.keyCode === 38){chavoTamalTwoPlayers.moveUp()};
+    if(e.keyCode === 40){chavoTamalTwoPlayers.moveDown()}
+    if(e.keyCode === 67){
+      audioExplosion.play();
+      fierrosViejosArr.push(fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + camion.height - 40))
+    }
+    if(e.keyCode === 77){
+      audioExplosion.play();
+      tamalesArr.push(tamales = new Tamales(chavoTamalTwoPlayers.x, chavoTamalTwoPlayers.y))
+    }
+  })
 }
 
 function gameOver(){
@@ -544,9 +713,9 @@ function gameOver(){
   audioGameOver.play();
   clearInterval(interval);
   interval = undefined;
-  example = false;
+  exampleLose = false;
   creditsLoseInterval = setInterval(function(){
-    if(!example){
+    if(!exampleLose){
     frames++;
     credits.draw();
     }
@@ -559,10 +728,11 @@ function winner(){
   audioBoss.pause();
   audioWinner.play();
   clearInterval(interval);
+  clearInterval(creditsLoseInterval);
   interval = undefined;
-  example = false;
+  exampleWin = false;
   creditsWinInterval = setInterval(function(){
-    if(!example){
+    if(!exampleWin){
     frames++;
     credits.drawWin();
     }
@@ -575,6 +745,7 @@ function restart(){
     time = 0;
     frames = 0;
     interval = undefined;
+    creditsWinInterval = undefined;
     creditsLoseInterval = undefined;
     electrodomesticos = [];
     chavoTamalArr = [];
@@ -584,48 +755,16 @@ function restart(){
     camionHealth = 1000;
     tamalesArr = [];
     audioGameOver.pause();
+    audioWinner.pause();
     tamalesFinalesArr = [];
     background.x = 0;
     background.y = 0;
     mainTheme.currentTime = 0;
     audioColchones.currentTime = 0;
     clearInterval(creditsLoseInterval);
-    creditsLoseInterval = undefined;
-    example = true
+    clearInterval(creditsWinInterval);
+    exampleLose = true
+    exampleWin = true
     credits = new Credits()
     startGame();
 }
-
-addEventListener("keydown", function(e){
-  // if(e.keyCode === 32){camion.jump()}
-  if(e.keyCode === 39){camion.moveForward(); background.x--; if(score <= 10){
-    camion.image.src = "./images/Camion 1 right.png";
-  } else if(score > 10 && score <= 20){
-    camion.image.src = "./images/Camion semi lleno right.png";
-    camion.height = 90;
-  } else if(score > 20){
-    camion.image.src = "./images/Camion lleno right.png";
-    camion.height = 100
-  }
-}
-  if(e.keyCode === 37){camion.moveBackwards(); background.x++; if( score <= 10){
-    camion.image.src = "./images/Camion 1 left.png";
-  } else if(score > 10 && score <= 20){
-    camion.image.src = "./images/Camion semi lleno left.png";
-    camion.height = 90
-  } else if(score > 20){
-    camion.image.src = "./images/Camion lleno left.png";
-    camion.height = 100;
-  }
-}
-  if(e.keyCode === 38){camion.moveUp()}
-  if(e.keyCode === 40){camion.moveDown()}
-  if(e.keyCode === 82){restart()};
-  if(e.keyCode === 71){gameOver()};
-  if(e.keyCode === 87){winner()};
-  if(e.keyCode === 67){score = 51};
-  if(e.keyCode === 32){
-    audioExplosion.play();
-    fierrosViejosArr.push(fierrosViejos = new FierrosViejos(camion.x + 120, camion.y + camion.height - 40))
-  }
-})

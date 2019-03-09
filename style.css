@@ -97,7 +97,11 @@ body {
   cursor: pointer;
 }
 
+.button-off{
+  display: none;
+}
+
 .game-nav {
-  margin-left: 130px;
+  margin-left: 180px;
   align-content: baseline;
 }
