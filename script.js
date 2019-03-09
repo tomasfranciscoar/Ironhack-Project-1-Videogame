@@ -166,7 +166,9 @@ class Electrodomesticos{
     this.image.src = imagesrc;
   }
   draw(){
-    this.y += .5;
+    if(this.y <350){
+      this.y += .5
+    }
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 }
