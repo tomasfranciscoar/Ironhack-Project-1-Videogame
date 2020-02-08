@@ -65,10 +65,11 @@ body {
 
 .instructions-detail {
   font-family: Helvetica, sans-serif;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   font-size: 20px;
   border-radius: 5px;
   width: 100%;
+  padding-bottom: 15px;
 }
 
 .instructions-detail-off {
@@ -89,9 +90,18 @@ body {
   line-height: 20px;
 }
 
+#button-cont {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
 #close-button {
   text-align: end;
   margin: 5px 5px 0 0;
+  width: 20px;
+  text-align: center;
+  border-radius: 5px;
 }
 
 .main-pannel-off {

@@ -54,6 +54,7 @@ instructionsButton.onclick = function(){
 
 closeButton.onclick = function(){
   instructionsDetail.setAttribute("class", "instructions-detail instructions-detail-off")
+  instructionsCont.setAttribute("class", "instructions-cont instructions-cont-off")
 }
 
 document.addEventListener("click", e => console.log(e)) 
