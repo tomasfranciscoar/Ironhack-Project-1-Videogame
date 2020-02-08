@@ -1,44 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="style.css">
-  <title>La ROMA Wars</title>
-</head>
-<body>
-    <div class="instructions-detail instructions-detail-off">
-        <h2>1 PLAYER GAME:</h2>  
-        <p>Press arrow keys to move<br>across La Roma neighbourhood<br>in Mexico City.<br><br>
-            Your goal is to collect as<br>much "fierros viejos" as you<br>can and fight angry tamales<br>chavitos who try to attack<br>you with their tamales.<br><br>Shoot them with Space bar.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css" />
+    <title>La ROMA Wars</title>
+  </head>
+  <body>
+    <div class="instructions-cont instructions-cont-off">
+      <div class="instructions-detail instructions-detail-off">
+        <button id="close-button">X</button>
+        <h2>1 PLAYER GAME:</h2>
+
+        <p>
+          Press arrow keys to move across La Roma neighbourhood in Mexico
+          City.<br /><br />
+          Your goal is to collect as much "fierros viejos" as you can and fight
+          angry tamales chavitos who try to attack you with their tamales.<br /><br />Shoot
+          them with Space bar.
+        </p>
         <h2>2 PLAYER GAME:</h2>
-        <p>It's a duel!<br><br>P1: move with A-W-S-D<br>Shoot with "V"<br><br>P2: move with arrow keys<br>Shoot with "M"</p>    
+        <p>
+          It's a duel!<br /><br />P1: move with A-W-S-D<br />Shoot with "V"<br /><br />P2:
+          move with arrow keys<br />Shoot with "M"
+        </p>
       </div>
-  <div class="main-pannel main-pannel-on">
-    <h1>La<br>ROMA<br>Wars</h1><br>
-    <div class="menu">
-      <ul>
-        <li id="onePlayerGame"> > 1 PLAYER GAME</li>
-        <li id="instructions"> > INSTRUCTIONS</li>
-      </ul>
-      <ul>
-        <li id="twoPlayerGame"> > 2 PLAYER GAME</li>
-        <li id="options"> > OPTIONS</li>
-      </ul>
     </div>
+
+    <div class="main-pannel main-pannel-on">
+      <h1>La<br />ROMA<br />Wars</h1>
+      <br />
+      <div class="menu">
+        <ul>
+          <li id="onePlayerGame">> 1 PLAYER GAME</li>
+          <li id="instructions">> INSTRUCTIONS</li>
+        </ul>
+        <ul>
+          <li id="twoPlayerGame">> 2 PLAYER GAME</li>
+          <li id="options">> OPTIONS</li>
+        </ul>
+      </div>
     </div>
-  <div class="main-game main-game-off">
-    <canvas id="canvas" width="800" height="450"></canvas><br>
-    <nav class="game-nav">
-      <button class="button" id="menu-btn">MENU</button>
-      <button class="button" id="start-game-btn">START GAME</button>
-      <button class="button" id="two-player-btn">START GAME</button>
-    </nav>
-  </div>
+    <div class="main-game main-game-off">
+      <canvas id="canvas" width="800" height="450"></canvas><br />
+      <nav class="game-nav">
+        <button class="button" id="menu-btn">MENU</button>
+        <button class="button" id="start-game-btn">START GAME</button>
+        <button class="button" id="two-player-btn">START GAME</button>
+      </nav>
+    </div>
 
-
-  <script src="./main.js"></script>
-  <script src="./script.js"></script>
-</body>
+    <script src="./main.js"></script>
+    <script src="./script.js"></script>
+  </body>
 </html>

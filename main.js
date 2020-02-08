@@ -7,6 +7,8 @@ var startGameButton = document.getElementById("start-game-btn");
 var twoPlayerButton = document.getElementById("two-player-btn");
 var instructionsButton = document.getElementById("instructions");
 var instructionsDetail = document.getElementsByClassName("instructions-detail")[0];
+var instructionsCont = document.getElementsByClassName("instructions-cont")[0]
+var closeButton = document.getElementById("close-button")
 
 onePlayer.onclick = function(){
   mainPannel.setAttribute("class", "main-pannel-off");
@@ -45,10 +47,13 @@ twoPlayerButton.onclick = function(){
   startGameTwoPlayers();
 }
 
-instructionsButton.onmouseover = function(){
+instructionsButton.onclick = function(){
   instructionsDetail.setAttribute("class", "instructions-detail")
+  instructionsCont.setAttribute("class", "instructions-cont")
 }
 
-instructionsButton.onmouseout = function(){
+closeButton.onclick = function(){
   instructionsDetail.setAttribute("class", "instructions-detail instructions-detail-off")
 }
+
+document.addEventListener("click", e => console.log(e)) 
