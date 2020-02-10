@@ -65,11 +65,12 @@ body {
 
 .instructions-detail {
   font-family: Helvetica, sans-serif;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.85);
   font-size: 20px;
   border-radius: 5px;
   width: 100%;
   padding-bottom: 15px;
+  border: 1px solid white;
 }
 
 .instructions-detail-off {
